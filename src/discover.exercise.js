@@ -6,6 +6,7 @@ import Tooltip from '@reach/tooltip'
 import {FaSearch} from 'react-icons/fa'
 import {Input, BookListUL, Spinner} from './components/lib'
 import {BookRow} from './components/book-row'
+import * as colors from 'styles/colors'
 // 🐨 import the client from './utils/api-client'
 
 function DiscoverBooksScreen() {
@@ -13,10 +14,12 @@ function DiscoverBooksScreen() {
   const [data, setData] = React.useState([])
   const [query, setQuery] = React.useState('')
   const [queried, setQueried] = React.useState(false)
+  const [error, setError] = React.useState(null)
 
   React.useEffect(() => {
     if (!queried) return
-    window.fetch(`${process.env.REACT_APP_API_URL}/books?query=${encodeURIComponent(query)}`).then(async response => {
+    window.fetch(`${process.env.REACT_APP_API_URL}/books?query=${encodeURIComponent(query)}`)
+    .then(async response => {
       const data = await response.json()
       setStatus('loading')
       if (response.ok) {
@@ -26,6 +29,15 @@ function DiscoverBooksScreen() {
       } else {
         return Promise.reject(data)
       }
+    },
+    e => {
+      console.log('error callback', e, e.message)
+      setStatus('error')
+      setError(e)
+    })
+    .catch(e => {
+      setStatus('error')
+      setError(e)
     })
   }, [query, queried])
 
@@ -63,6 +75,16 @@ function DiscoverBooksScreen() {
           </label>
         </Tooltip>
       </form>
+
+      {
+        (status === 'error' && error) ? (
+          <div css={{color: colors.danger}}>
+            <p>There was an error:</p>
+            {console.log(error)}
+            <pre>{error.message}</pre>
+          </div>
+        ) : null
+      }
 
       {status === 'success' ? (
         data?.books?.length ? (
