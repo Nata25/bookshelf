@@ -7,7 +7,7 @@ import {FaSearch} from 'react-icons/fa'
 import {Input, BookListUL, Spinner} from './components/lib'
 import {BookRow} from './components/book-row'
 import * as colors from 'styles/colors'
-// 🐨 import the client from './utils/api-client'
+import {client} from './utils/api-client'
 
 function DiscoverBooksScreen() {
   const [status, setStatus] = React.useState('idle')
@@ -17,28 +17,21 @@ function DiscoverBooksScreen() {
   const [error, setError] = React.useState(null)
 
   React.useEffect(() => {
-    if (!queried) return
-    window.fetch(`${process.env.REACT_APP_API_URL}/books?query=${encodeURIComponent(query)}`)
-    .then(async response => {
-      const data = await response.json()
+    const getBooks = async (q) => {
       setStatus('loading')
-      if (response.ok) {
-        setStatus('success')
-        console.log(data)
-        setData(data)
-      } else {
-        return Promise.reject(data)
+      try {
+        const data = await client(`books?query=${encodeURIComponent(q)}`)
+        if (data) {
+          setStatus('success')
+          setData(data)
+        }
+      } catch (e) {
+        setStatus('error')
+        setError(e)
       }
-    },
-    e => {
-      console.log('error callback', e, e.message)
-      setStatus('error')
-      setError(e)
-    })
-    .catch(e => {
-      setStatus('error')
-      setError(e)
-    })
+    }
+    if (!queried) return
+    getBooks(query)
   }, [query, queried])
 
 
