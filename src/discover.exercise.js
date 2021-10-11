@@ -8,31 +8,18 @@ import {Input, BookListUL, Spinner} from './components/lib'
 import {BookRow} from './components/book-row'
 import * as colors from 'styles/colors'
 import {client} from './utils/api-client'
+import { useAsync } from 'utils/hooks'
 
 function DiscoverBooksScreen() {
-  const [status, setStatus] = React.useState('idle')
-  const [data, setData] = React.useState([])
   const [query, setQuery] = React.useState('')
   const [queried, setQueried] = React.useState(false)
-  const [error, setError] = React.useState(null)
+
+  const {data, error, run, isLoading, isError, isSuccess} = useAsync()
 
   React.useEffect(() => {
-    const getBooks = async (q) => {
-      setStatus('loading')
-      try {
-        const data = await client(`books?query=${encodeURIComponent(q)}`)
-        if (data) {
-          setStatus('success')
-          setData(data)
-        }
-      } catch (e) {
-        setStatus('error')
-        setError(e)
-      }
-    }
     if (!queried) return
-    getBooks(query)
-  }, [query, queried])
+    run(client(`books?query=${encodeURIComponent(query)}`))
+  }, [run, query, queried])
 
 
   function handleSearchSubmit(event) {
@@ -63,23 +50,22 @@ function DiscoverBooksScreen() {
                 background: 'transparent',
               }}
             >
-              {status === 'loading' ? <Spinner /> : <FaSearch aria-label="search" />}
+              {isLoading ? <Spinner /> : <FaSearch aria-label="search" />}
             </button>
           </label>
         </Tooltip>
       </form>
 
       {
-        (status === 'error' && error) ? (
+        (isError && error) ? (
           <div css={{color: colors.danger}}>
             <p>There was an error:</p>
-            {console.log(error)}
             <pre>{error.message}</pre>
           </div>
         ) : null
       }
 
-      {status === 'success' ? (
+      {isSuccess ? (
         data?.books?.length ? (
           <BookListUL css={{marginTop: 20}}>
             {data.books.map(book => (
