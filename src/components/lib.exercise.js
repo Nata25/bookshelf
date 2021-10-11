@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import { jsx, keyframes } from '@emotion/core'
+import { keyframes } from '@emotion/core'
 import styled from '@emotion/styled/macro'
 import * as colors from 'styles/colors'
 import * as mq from 'styles/media-queries'
@@ -25,31 +25,24 @@ Spinner.defaultProps = {
   'aria-label': 'loading'
 }
 
-const Button = ({ variant, onClick, children }) => {
-  const variants = {
-    primary: {
-      background: colors.indigo,
-      color: colors.base,
-    },
-    secondary: {
-      background: colors.gray,
-      color: colors.text,
-    }
+const variants = {
+  primary: {
+    background: colors.indigo,
+    color: colors.base,
+  },
+  secondary: {
+    background: colors.gray,
+    color: colors.text,
   }
-  return (
-    <button
-      css={{
-        padding: '10px 15px',
-        border: '0',
-        lineHeight: '1',
-        borderRadius: '3px',
-        ...variants[variant]
-      }}
-      onClick={onClick}
-    >{children}
-    </button>
-  )
 }
+const Button = styled.button({
+  padding: '10px 15px',
+  border: '0',
+  lineHeight: '1',
+  borderRadius: '3px',
+  },
+  (props) => variants[props.variant]
+)
 
 const Input = styled.input({
   borderRadius: '3px',
