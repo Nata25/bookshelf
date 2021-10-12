@@ -14,11 +14,8 @@ import * as colors from 'styles/colors'
 async function getUser () {
   const token = await auth.getToken()
   if (token) {
-    const headers = {
-      Authorization: `Bearer ${token}`,
-    }
     try {
-      const data = await client('me', {headers})
+      const data = await client('me', {token})
       if (data) return data.user
     } catch (e) {
       // handle auth error
