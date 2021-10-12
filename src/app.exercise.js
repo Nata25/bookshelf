@@ -17,8 +17,17 @@ async function getUser () {
     const headers = {
       Authorization: `Bearer ${token}`,
     }
-    const data = await client('me', {headers})
-    if (data) return data.user
+    try {
+      const data = await client('me', {headers})
+      if (data) return data.user
+    } catch (e) {
+      // handle auth error
+      console.log('error caught on auth', e)
+      if (e.status >= 401 && e.status < 500) {
+        auth.logout()
+        window.location.assign(window.location)
+      }
+    }
   }
 }
 
