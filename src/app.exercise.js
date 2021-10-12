@@ -6,47 +6,76 @@ import * as auth from 'auth-provider'
 import {AuthenticatedApp} from './authenticated-app'
 import {UnauthenticatedApp} from './unauthenticated-app'
 import { client } from 'utils/api-client.exercise'
+import { useAsync } from 'utils/hooks'
+import { FullPageSpinner } from './components/lib'
+
+import * as colors from 'styles/colors'
+
+async function getUser () {
+  const token = await auth.getToken()
+  if (token) {
+    const headers = {
+      Authorization: `Bearer ${token}`,
+    }
+    const data = await client('me', {headers})
+    if (data) return data.user
+  }
+}
 
 function App() {
-  const [user, setUser] = React.useState(null)
+  const {
+    data: user,
+    error,
+    isIdle,
+    isLoading,
+    isSuccess,
+    isError,
+    setData,
+    run
+  } = useAsync()
 
-  async function login ({ username, password } = {}) {
-    const user = await auth.login({ username, password })
-    if (user) setUser(user)
+  function login ({ username, password } = {}) {
+    return auth.login({ username, password }).then(u => setData(u))
   }
 
-  async function register ({ username, password } = {}) {
-    const user = await auth.register({ username, password })
-    if (user) setUser(user)
+  function register ({ username, password } = {}) {
+    return auth.register({ username, password }).then(u => setData(u))
   }
 
   function logout () {
     auth.logout()
-    setUser(null)
-  }
-
-  async function getUser () {
-    const token = await auth.getToken()
-    if (token) {
-      const headers = {
-        Authorization: `Bearer ${token}`,
-      }
-      client('me', {headers}).then(data => {
-        setUser(data.user)
-      })
-    } else {
-      setUser(null)
-    }
+    setData(null)
   }
 
   React.useEffect(() => {
-    getUser()
-  }, [])
+    run(getUser())
+  }, [run])
 
   return (
     <div>
-      {user && <AuthenticatedApp user={user} logout={logout} />}
-      {!user && <UnauthenticatedApp login={login} register={register} />}
+      {(isLoading || isIdle) && (
+        <FullPageSpinner />
+      )}
+      {isError && error && (
+        <div
+          css={{
+            color: colors.danger,
+            height: '100vh',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <p>Uh oh... There's a problem. Try refreshing the app.</p>
+          <pre>{error.message}</pre>
+        </div>
+      )}
+      {isSuccess && <>
+        {user && <AuthenticatedApp user={user} logout={logout} />}
+        {(!user) && <UnauthenticatedApp login={login} register={register} />}
+        </>
+      }
     </div>
   )
 }
