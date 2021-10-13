@@ -14,7 +14,7 @@ import {Rating} from 'components/rating'
 import {StatusButtons} from 'components/status-buttons'
 import {useBook} from 'utils/books'
 import {useListItem, useUpdateListItem} from 'utils/list-items'
-import {ErrorMessage} from 'components/lib'
+import {ErrorMessage, Spinner} from 'components/lib'
 
 function BookScreen({user}) {
   const {bookId} = useParams()
@@ -103,7 +103,7 @@ function ListItemTimeframe({listItem}) {
 }
 
 function NotesTextarea({listItem, user}) {
-  const [mutate, { isError, error }] = useUpdateListItem(user, listItem)
+  const [mutate, { isError, isLoading, error }] = useUpdateListItem(user, listItem)
   const debouncedMutate = React.useMemo(() => debounceFn(mutate, {wait: 300}), [
     mutate,
   ])
@@ -127,13 +127,14 @@ function NotesTextarea({listItem, user}) {
         >
           Notes
         </label>
+        {isError ?
+        <ErrorMessage
+          variant="inline"
+          error={error}
+          css={{marginLeft: 6, fontSize: '0.7em', marginBottom: 10}}
+        /> : null}
+        {isLoading ? <Spinner /> : null}
       </div>
-      {isError ?
-      <ErrorMessage
-        variant="inline"
-        error={error}
-        css={{marginLeft: 6, fontSize: '0.7em', marginBottom: 10}}
-      /> : null}
       <Textarea
         id="notes"
         defaultValue={listItem.notes}

@@ -14,7 +14,6 @@ function DiscoverBooksScreen({user}) {
   const [queried, setQueried] = React.useState(false)
 
   const {books, error, isLoading, isError, isSuccess} = useBookSearch(query, user)
-  console.log('books!!!!', books)
   function handleSearchSubmit(event) {
     event.preventDefault()
     setQueried(true)
