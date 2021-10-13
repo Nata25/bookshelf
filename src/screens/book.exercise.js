@@ -12,27 +12,14 @@ import * as colors from 'styles/colors'
 import {Textarea} from 'components/lib'
 import {Rating} from 'components/rating'
 import {StatusButtons} from 'components/status-buttons'
-import bookPlaceholderSvg from 'assets/book-placeholder.svg'
 import {useBook} from 'utils/books'
-import {useListItems, useUpdateListItem} from 'utils/list-items'
-
-const loadingBook = {
-  title: 'Loading...',
-  author: 'loading...',
-  coverImageUrl: bookPlaceholderSvg,
-  publisher: 'Loading Publishing',
-  synopsis: 'Loading...',
-  loadingBook: true,
-}
+import {useListItem, useUpdateListItem} from 'utils/list-items'
 
 function BookScreen({user}) {
   const {bookId} = useParams()
-  const bookData = useBook(bookId, user)
-  const listItems = useListItems(user)
+  const book = useBook(bookId, user)
+  const listItem = useListItem(user, bookId)
 
-  const listItem = listItems?.find(li => li.bookId === bookId)
-
-  const book = bookData?.book ?? loadingBook
   const {title, author, coverImageUrl, publisher, synopsis} = book
 
   return (

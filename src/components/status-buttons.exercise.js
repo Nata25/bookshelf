@@ -14,7 +14,7 @@ import {useAsync} from 'utils/hooks'
 import * as colors from 'styles/colors'
 import {CircleButton, Spinner} from './lib'
 import {
-  useListItems,
+  useListItem,
   useRemoveListItem,
   useUpdateListItem,
   useCreateListItem
@@ -53,8 +53,7 @@ function TooltipButton({label, highlight, onClick, icon, ...rest}) {
 }
 
 function StatusButtons({user, book}) {
-  const listItems = useListItems(user)
-  const listItem = listItems?.find(listI => listI.bookId === book.id) ?? null
+  const listItem = useListItem(user, book.id)
   const update = useUpdateListItem(user)
   const remove = useRemoveListItem(user)
   const create = useCreateListItem(user)

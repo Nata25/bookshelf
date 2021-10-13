@@ -9,6 +9,11 @@ function useListItems ({token}) {
 	return data
 }
 
+function useListItem(user, bookId) {
+	const listItems = useListItems(user)
+	return listItems?.find(li => li.bookId === bookId) ?? null
+}
+
 function useCreateListItem({token}) {
 	const [create] = useMutation(({bookId}) => {
     return client('list-items', {
@@ -48,6 +53,7 @@ function useRemoveListItem ({token}) {
 
 export {
 	useListItems,
+	useListItem,
 	useCreateListItem,
 	useUpdateListItem,
 	useRemoveListItem
