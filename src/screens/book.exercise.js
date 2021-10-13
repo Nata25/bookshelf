@@ -14,6 +14,7 @@ import {Rating} from 'components/rating'
 import {StatusButtons} from 'components/status-buttons'
 import {useBook} from 'utils/books'
 import {useListItem, useUpdateListItem} from 'utils/list-items'
+import {ErrorMessage} from 'components/lib'
 
 function BookScreen({user}) {
   const {bookId} = useParams()
@@ -102,7 +103,7 @@ function ListItemTimeframe({listItem}) {
 }
 
 function NotesTextarea({listItem, user}) {
-  const mutate = useUpdateListItem(user, listItem)
+  const [mutate, { isError, error }] = useUpdateListItem(user, listItem)
   const debouncedMutate = React.useMemo(() => debounceFn(mutate, {wait: 300}), [
     mutate,
   ])
@@ -127,11 +128,17 @@ function NotesTextarea({listItem, user}) {
           Notes
         </label>
       </div>
+      {isError ? 
+      <ErrorMessage        
+        variant="inline"
+        error={error}
+        css={{marginLeft: 6, fontSize: '0.7em', marginBottom: 10}}
+      /> : null}
       <Textarea
         id="notes"
         defaultValue={listItem.notes}
         onChange={handleNotesChange}
-        css={{width: '100%', minHeight: 300}}
+        css={{width: '100%', minHeight: 300 }}
       />
     </React.Fragment>
   )

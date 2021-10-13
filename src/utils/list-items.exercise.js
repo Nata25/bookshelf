@@ -1,6 +1,8 @@
 import {useQuery, useMutation, queryCache} from 'react-query'
 import {client} from 'utils/api-client'
 
+const onSettled = () => queryCache.invalidateQueries('list-items')
+
 function useListItems ({token}) {
 	const { data } = useQuery({
     queryKey: 'list-items',
@@ -20,23 +22,19 @@ function useCreateListItem({token}) {
 			token,
 			data: { bookId }
 		})
-	}, {
-		onSettled: () => queryCache.invalidateQueries('list-items')
-	})
+	}, { onSettled })
 	return create
 }
 
 function useUpdateListItem({token}) {
-	const [mutate] = useMutation((data) => {
+	const result = useMutation((data) => {
     return client(`list-items/${data.id}`, {
 			method: 'PUT',
 			token,
 			data
 		})
-	}, {
-    onSettled: () => queryCache.invalidateQueries('list-items')
-  })
-	return mutate
+	}, { onSettled })
+	return result
 }
 
 function useRemoveListItem ({token}) {
@@ -45,9 +43,7 @@ function useRemoveListItem ({token}) {
 			token,
 			method: 'DELETE'
 		})
-	}, {
-      onSettled: () => queryCache.invalidateQueries('list-items')
-	})
+	}, { onSettled })
 	return remove
 }
 
