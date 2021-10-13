@@ -128,8 +128,8 @@ function NotesTextarea({listItem, user}) {
           Notes
         </label>
       </div>
-      {isError ? 
-      <ErrorMessage        
+      {isError ?
+      <ErrorMessage
         variant="inline"
         error={error}
         css={{marginLeft: 6, fontSize: '0.7em', marginBottom: 10}}

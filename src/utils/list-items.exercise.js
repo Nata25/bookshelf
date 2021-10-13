@@ -16,35 +16,32 @@ function useListItem(user, bookId) {
 	return listItems?.find(li => li.bookId === bookId) ?? null
 }
 
-function useCreateListItem({token}) {
-	const [create] = useMutation(({bookId}) => {
+function useCreateListItem({token}, options) {
+	return useMutation(({bookId}) => {
     return client('list-items', {
 			token,
 			data: { bookId }
 		})
-	}, { onSettled })
-	return create
+	}, { onSettled, ...options })
 }
 
-function useUpdateListItem({token}) {
-	const result = useMutation((data) => {
+function useUpdateListItem({token}, options) {
+	return useMutation((data) => {
     return client(`list-items/${data.id}`, {
 			method: 'PUT',
 			token,
 			data
 		})
-	}, { onSettled })
-	return result
+	}, { onSettled, ...options })
 }
 
-function useRemoveListItem ({token}) {
-	const [remove] = useMutation((id) => {
+function useRemoveListItem ({token}, options) {
+	return useMutation((id) => {
     return client(`list-items/${id}`, {
 			token,
 			method: 'DELETE'
 		})
-	}, { onSettled })
-	return remove
+	}, { onSettled, ...options })
 }
 
 export {
