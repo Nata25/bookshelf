@@ -1,4 +1,4 @@
-import {useQuery} from 'react-query'
+import {useQuery, queryCache} from 'react-query'
 import {client} from 'utils/api-client'
 import bookPlaceholderSvg from 'assets/book-placeholder.svg'
 
@@ -16,6 +16,27 @@ const loadingBooks = Array.from({length: 10}, (v, index) => ({
   ...loadingBook,
 }))
 
+const getBookSearchQueryConfig = ({ query, token }) => {
+	return {
+		queryKey: ['bookSearch', {query}],
+		queryFn: () => client(`books?query=${encodeURIComponent(query)}`, {token}).then(data => data.books)
+	}
+}
+
+async function refetchBookSearchQuery (user) {
+	queryCache.removeQueries('bookSearch')
+	await queryCache.prefetchQuery(
+		getBookSearchQueryConfig({ query: '', token: user.token })
+	)
+}
+
+function useBookSearch(query, user) {
+	const result = useQuery(
+		getBookSearchQueryConfig({ query, token: user.token })
+	)
+	return { ...result, books: result?.data ?? loadingBooks }
+}
+
 function useBook (bookId, user) {
 	const { data } = useQuery({
     queryKey: ['book', {bookId}],
@@ -24,19 +45,8 @@ function useBook (bookId, user) {
 	return data?.book ?? loadingBook
 }
 
-function useBookSearch(query, user) {
-	const result = useQuery({
-    queryKey: ['bookSearch', {query}],
-    queryFn: () => {
-      return client(`books?query=${encodeURIComponent(query)}`, {
-        token: user.token,
-      }).then(data => data.books)
-    }
-  })
-	return { ...result, books: result?.data ?? loadingBooks }
-}
-
 export {
 	useBook,
-	useBookSearch
+	useBookSearch,
+	refetchBookSearchQuery
 }
