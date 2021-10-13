@@ -2,22 +2,16 @@
 import {jsx} from '@emotion/core'
 
 import {Link} from 'react-router-dom'
-import { useQuery } from 'react-query'
-import {client} from 'utils/api-client'
 import * as mq from 'styles/media-queries'
 import * as colors from 'styles/colors'
 import {StatusButtons} from './status-buttons'
 import {Rating} from './rating'
+import {useListItems} from 'utils/list-items'
 
 function BookRow({user, book}) {
   const {title, author, coverImageUrl} = book
 
-  const { data } = useQuery({
-    queryKey: 'list-items',
-    queryFn: () => client('list-items', {
-      token: user.token
-    }).then(data => data.listItems)
-  })
+  const data = useListItems(user)
   
   const listItem = data?.find(li => li.bookId === book.id) ?? null
 

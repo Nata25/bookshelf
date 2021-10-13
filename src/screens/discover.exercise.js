@@ -10,6 +10,7 @@ import * as colors from 'styles/colors'
 import {BookRow} from 'components/book-row'
 import {BookListUL, Spinner, Input} from 'components/lib'
 import bookPlaceholderSvg from 'assets/book-placeholder.svg'
+import {useBookSearch} from 'utils/books'
 
 const loadingBook = {
   title: 'Loading...',
@@ -29,14 +30,7 @@ function DiscoverBooksScreen({user}) {
   const [query, setQuery] = React.useState('')
   const [queried, setQueried] = React.useState(false)
 
-  const {data, error, isLoading, isError, isSuccess} = useQuery({
-    queryKey: ['bookSearch', {query}],
-    queryFn: () => {
-      return client(`books?query=${encodeURIComponent(query)}`, {
-        token: user.token,
-      }).then(data => data.books)
-    }
-  })
+  const {data, error, isLoading, isError, isSuccess} = useBookSearch(query, user)
 
   const books = data ?? loadingBooks
 
