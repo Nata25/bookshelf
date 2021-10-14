@@ -6,6 +6,13 @@ const onSettled = () => queryCache.invalidateQueries('list-items')
 const onSuccess = (data) => {
 	data.forEach((item) => setQueryDataForBook(item.bookId, item.book))
 }
+const onError = (err, newTodo, rollback) => {
+	if (typeof rollback === 'function') rollback()
+}
+const onMutateDefault = () => {
+	queryCache.cancelQueries('list-items')
+	return queryCache.getQueryData('list-items')
+}
 
 function useListItems ({token}) {
 	const { data } = useQuery({
@@ -37,7 +44,18 @@ function useUpdateListItem({token}, options) {
 			token,
 			data
 		})
-	}, { onSettled, ...options })
+	}, {
+		...options,
+		onMutate (data) {
+			const previousList = onMutateDefault()
+			queryCache.setQueryData('list-items', oldList => {
+				return oldList.map(li => li.id === data.id ? { ...li, ...data } : li)
+			})
+			return () => queryCache.setQueryData('list-items', previousList)
+		},
+		onSettled,
+		onError
+	})
 }
 
 function useRemoveListItem ({token}, options) {
@@ -46,7 +64,20 @@ function useRemoveListItem ({token}, options) {
 			token,
 			method: 'DELETE'
 		})
-	}, { onSettled, ...options })
+	}, {
+		...options,
+		onMutate(removedItem) {
+			const previousItems = queryCache.getQueryData('list-items')
+
+			queryCache.setQueryData('list-items', old => {
+				return old.filter(item => item.id !== removedItem.id)
+			})
+
+			return () => queryCache.setQueryData('list-items', previousItems)
+		},
+		onSettled,
+		onError
+	})
 }
 
 export {
