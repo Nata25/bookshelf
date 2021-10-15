@@ -17,11 +17,10 @@ const visuallyHiddenCSS = {
   position: 'absolute',
   width: '1px',
 }
-// 💣 remove the user prop
-function Rating({listItem, user}) {
+
+function Rating({listItem}) {
   const [isTabbing, setIsTabbing] = React.useState(false)
-  // 💣 we no longer need to pass the user here:
-  const [update, {error, isError}] = useUpdateListItem(user)
+  const [update, {error, isError}] = useUpdateListItem()
 
   React.useEffect(() => {
     function handleKeyDown(event) {
@@ -54,10 +53,6 @@ function Rating({listItem, user}) {
             {
               [`.${rootClassName} &:checked ~ label`]: {color: colors.gray20},
               [`.${rootClassName} &:checked + label`]: {color: 'orange'},
-              // !important is here because we're doing special non-css-in-js things
-              // and so we have to deal with specificity and cascade. But, I promise
-              // this is better than trying to make this work with JavaScript.
-              // So deal with it 😎
               [`.${rootClassName} &:hover ~ label`]: {
                 color: `${colors.gray20} !important`,
               },
