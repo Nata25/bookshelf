@@ -5,11 +5,12 @@ import {useAsync} from 'utils/hooks'
 import {client} from 'utils/api-client'
 
 const AuthContext = React.createContext()
+AuthContext.displayName = 'AuthContext'
 
 function useAuth () {
 	const context = React.useContext(AuthContext)
 	if (context === undefined) {
-		throw new Error('`useAuth` should be used inside AuthContextProvider.')
+		throw new Error('`useAuth` should be used inside AuthProvider.')
 	} else {
 		return context // { user, register, login, logout }
 	}
@@ -27,7 +28,7 @@ async function getUser() {
   return user
 }
 
-function AuthContextProvider ({children}) {
+function AuthProvider ({children}) {
 	const {
     data: user,
     error,
@@ -67,4 +68,4 @@ function AuthContextProvider ({children}) {
   }
 }
 
-export {useAuth, AuthContextProvider}
+export {useAuth, AuthProvider}
