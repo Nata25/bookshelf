@@ -16,6 +16,13 @@ function useAuth () {
 	}
 }
 
+function useClient () {
+  const {token} = useAuth().user
+  return React.useCallback((endpoint, config) => {
+    return client(endpoint, {...config, token})
+  }, [token])
+}
+
 async function getUser() {
   let user = null
 
@@ -68,4 +75,4 @@ function AuthProvider ({children}) {
   }
 }
 
-export {useAuth, AuthProvider}
+export {useAuth, useClient, AuthProvider}
