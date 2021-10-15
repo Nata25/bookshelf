@@ -2,6 +2,16 @@ import React from 'react'
 // 📜 https://reacttraining.com/reach-ui/dialog/
 import {Dialog} from './lib'
 
+function callAll (...fns) {
+  return function (args) {
+    fns.forEach(fn => {
+      if (fn && typeof fn === 'function') {
+        fn(args)
+      }
+    })
+  }
+}
+
 const ModalContext = React.createContext()
 
 const Modal = ({children}) => {
@@ -13,22 +23,23 @@ const Modal = ({children}) => {
   )
 }
 
-const ModalDismissButton = ({ children, ...props }) => {
+const ModalDismissButton = ({ children: child, ...props }) => {
   const {setIsOpen} = React.useContext(ModalContext)
   return (
     <div {...props}>
-      {React.cloneElement(children, {
-        onClick: () => setIsOpen(false)
+      {React.cloneElement(child, {
+        onClick: callAll(child.props.onClick, () => setIsOpen(false))
       })}
     </div>
   )
 }
 
-const ModalOpenButton = ({children}) => {
+const ModalOpenButton = ({children: child, ...props}) => {
   const {setIsOpen} = React.useContext(ModalContext)
   return (
-    React.cloneElement(children, {
-      onClick: () => setIsOpen(true)
+    React.cloneElement(child, {
+      onClick: callAll(child.props.onClick, () => setIsOpen(true)),
+      ...props
     })
   )
 }

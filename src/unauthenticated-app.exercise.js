@@ -117,7 +117,7 @@ function UnauthenticatedApp() {
         {/* Register form */}
         <Modal>
           <ModalOpenButton>
-            <Button variant="secondary">Register</Button>
+            <Button variant="secondary" onClick={() => console.log('opening the modal')}>Register</Button>
           </ModalOpenButton>
           <ModalContents aria-label="Registration form">
             <ModalDismissButton css={{display: 'flex', justifyContent: 'flex-end'}}>
