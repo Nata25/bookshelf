@@ -1,6 +1,9 @@
+/** @jsx jsx */
+import {jsx} from '@emotion/core'
 import React from 'react'
 // 📜 https://reacttraining.com/reach-ui/dialog/
-import {Dialog} from './lib'
+import {Dialog, CircleButton,} from './lib'
+import VisuallyHidden from '@reach/visually-hidden'
 
 function callAll (...fns) {
   return function (args) {
@@ -44,15 +47,31 @@ const ModalOpenButton = ({children: child, ...props}) => {
   )
 }
 
-const ModalContents = (props) => {
+const ModalContentsBase = (props) => {
   const {isOpen, setIsOpen} = React.useContext(ModalContext)
   return (
     <Dialog isOpen={isOpen} onDismiss={() => setIsOpen(false)} {...props}/>
   )
 }
 
+const ModalContents = ({title, children, ...props}) => {
+  return (
+    <ModalContentsBase {...props}>
+      <ModalDismissButton css={{display: 'flex', justifyContent: 'flex-end'}}>
+        <CircleButton>
+          <VisuallyHidden>Close</VisuallyHidden>
+          <span aria-hidden>×</span>
+        </CircleButton>
+      </ModalDismissButton>
+      <h3 css={{textAlign: 'center', fontSize: '2em'}}>{title}</h3>
+      {children}
+    </ModalContentsBase>
+  )
+}
+
 export {
   Modal,
+  ModalContentsBase,
   ModalContents,
   ModalOpenButton,
   ModalDismissButton
