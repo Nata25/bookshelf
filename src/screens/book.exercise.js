@@ -24,7 +24,7 @@ function BookScreen() {
   const {title, author, coverImageUrl, publisher, synopsis} = book
 
   return (
-    <Profiler id="Book screen">
+    <Profiler id="Book screen" metadata={{bookId, listItemId: listItem?.id}}>
       <div>
         <div
           css={{

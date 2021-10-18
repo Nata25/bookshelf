@@ -1,7 +1,7 @@
 import React from 'react'
 import {client} from 'utils/api-client'
 
-function Profiler ({id, phases, children}) {
+function Profiler ({id, phases, metadata, ...props}) {
 	if (phases && phases.includes('mount')) console.log(`Profiler for ${id} init.`)
 	const queue = React.useRef([])
 	const sendData = (data) => {
@@ -11,7 +11,7 @@ function Profiler ({id, phases, children}) {
 	const callback = (...data) => {
 		const [id, phase, actualDuration, baseDuration, startTime, commitTime] = data
 		if (!phases || phases.includes(phase)) {
-			const profilerData = {id, phase, actualDuration, baseDuration, startTime, commitTime}
+			const profilerData = {metadata, id, phase, actualDuration, baseDuration, startTime, commitTime}
 			queue.current.push(profilerData)
 		}
 	}
@@ -28,9 +28,7 @@ function Profiler ({id, phases, children}) {
 	}, [])
 
 	return (
-		<React.Profiler id={id} onRender={callback}>
-			{children}
-		</React.Profiler>
+		<React.Profiler id={id} onRender={callback} {...props}/>
 	)
 }
 
