@@ -9,9 +9,18 @@ function Profiler ({id, phases, metadata, ...props}) {
 	}
 
 	const callback = (...data) => {
-		const [id, phase, actualDuration, baseDuration, startTime, commitTime] = data
+		const [id, phase, actualDuration, baseDuration, startTime, commitTime, interactions] = data
 		if (!phases || phases.includes(phase)) {
-			const profilerData = {metadata, id, phase, actualDuration, baseDuration, startTime, commitTime}
+			const profilerData = {
+				metadata,
+				id,
+				phase,
+				actualDuration,
+				baseDuration,
+				startTime,
+				commitTime,
+				interactions: [...interactions]
+			}
 			queue.current.push(profilerData)
 		}
 	}
