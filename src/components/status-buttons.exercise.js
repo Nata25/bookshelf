@@ -20,7 +20,6 @@ import * as colors from 'styles/colors'
 import {useAsync} from 'utils/hooks'
 import {CircleButton, Spinner} from './lib'
 import {unstable_trace as trace} from 'scheduler/tracing'
-import {Profiler} from 'components/profiler'
 
 function TooltipButton({label, highlight, onClick, icon, ...rest}) {
   const {isLoading, isError, error, run, reset} = useAsync()
@@ -29,8 +28,7 @@ function TooltipButton({label, highlight, onClick, icon, ...rest}) {
     if (isError) {
       reset()
     } else {
-      console.log(trace)
-      trace('click', performance.now(), () => {
+      trace(`Click ${label}`, performance.now(), () => {
         run(onClick())
       })
     }
@@ -71,43 +69,35 @@ function StatusButtons({book}) {
     <React.Fragment>
       {listItem ? (
         Boolean(listItem.finishDate) ? (
-          <Profiler id="List Item: finished">
-            <TooltipButton
-              label="Unmark as read"
-              highlight={colors.yellow}
-              onClick={() => mutate({id: listItem.id, finishDate: null})}
-              icon={<FaBook />}
-            />
-          </Profiler>
+          <TooltipButton
+            label="Unmark as read"
+            highlight={colors.yellow}
+            onClick={() => mutate({id: listItem.id, finishDate: null})}
+            icon={<FaBook />}
+          />
         ) : (
-          <Profiler id="List Item: added">
-            <TooltipButton
-              label="Mark as read"
-              highlight={colors.green}
-              onClick={() => mutate({id: listItem.id, finishDate: Date.now()})}
-              icon={<FaCheckCircle />}
-            />
-          </Profiler>
+          <TooltipButton
+            label="Mark as read"
+            highlight={colors.green}
+            onClick={() => mutate({id: listItem.id, finishDate: Date.now()})}
+            icon={<FaCheckCircle />}
+          />
         )
       ) : null}
       {listItem ? (
-        <Profiler id="List Item: remove button">
-          <TooltipButton
-            label="Remove from list"
-            highlight={colors.danger}
-            onClick={() => handleRemoveClick({id: listItem.id})}
-            icon={<FaMinusCircle />}
-          />
-        </Profiler>
+        <TooltipButton
+          label="Remove from list"
+          highlight={colors.danger}
+          onClick={() => handleRemoveClick({id: listItem.id})}
+          icon={<FaMinusCircle />}
+        />
       ) : (
-        <Profiler id="List Item: add button">
-          <TooltipButton
-            label="Add to list"
-            highlight={colors.indigo}
-            onClick={() => handleAddClick({bookId: book.id})}
-            icon={<FaPlusCircle />}
-          />
-        </Profiler>
+        <TooltipButton
+          label="Add to list"
+          highlight={colors.indigo}
+          onClick={() => handleAddClick({bookId: book.id})}
+          icon={<FaPlusCircle />}
+        />
       )}
     </React.Fragment>
   )
