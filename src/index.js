@@ -5,6 +5,9 @@ import ReactDOM from 'react-dom'
 import {Profiler} from 'components/profiler'
 import {App} from './app'
 import {AppProviders} from './context'
+import {formatDate} from 'utils/misc'
+
+console.log(formatDate(Date.now()))
 
 loadDevTools(() => {
   ReactDOM.render(
