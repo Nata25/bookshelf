@@ -42,11 +42,34 @@ test('adds auth token when a token is provided', async () => {
   expect(request.headers.get('Authorization')).toBe(`Bearer ${token}`)
 })
     
-test.todo('allows for config overrides')
-// 🐨 do a very similar setup to the previous test
-// 🐨 create a custom config that specifies properties like "mode" of "cors" and a custom header
-// 🐨 call the client with the endpoint and the custom config
-// 🐨 verify the request had the correct properties
+test('allows for config overrides for headers', async () => {
+  const mode = 'same-origin'
+  const headers = {mode}
+  let request
+  const endpoint = 'endpoint'
+  server.use(
+    rest.get(`${apiUrl}/${endpoint}`, async (req, res, ctx) => {
+      request = req
+      return res(ctx.json({}))
+    }),
+  )
+  await client(endpoint, { headers })
+  expect(request.headers.get('mode')).toBe(mode)
+})
+
+test('allows for config overrides for request method', async () => {
+  let request
+  const endpoint = 'endpoint'
+  const method = 'PUT'
+  server.use(
+    rest.put(`${apiUrl}/${endpoint}`, async (req, res, ctx) => {
+      request = req
+      return res(ctx.json({}))
+    }),
+  )
+  await client(endpoint, { method })
+  expect(request.method).toBe(method)
+})
 
 test.todo(
   'when data is provided, it is stringified and the method defaults to POST',
