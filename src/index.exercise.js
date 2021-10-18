@@ -4,12 +4,12 @@ import * as React from 'react'
 import ReactDOM from 'react-dom'
 import {App} from './app'
 import {AppProviders} from './context'
-import Profiler from 'components/profiler.exercise'
+import {Profiler} from 'components/profiler'
 
 loadDevTools(() => {
   ReactDOM.render(
     <AppProviders>
-      <Profiler id="Root Profiler">
+      <Profiler id="Root Profiler" phases={['mount']}>
         <App />
       </Profiler>
     </AppProviders>,
