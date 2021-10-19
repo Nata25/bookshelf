@@ -1,4 +1,3 @@
-// 🐨 instead of React Testing Library, you'll use React Hooks Testing Library
 import {renderHook, act} from '@testing-library/react-hooks'
 import {useAsync} from '../hooks'
 
@@ -11,14 +10,14 @@ function deferred() {
   return {promise, resolve, reject}
 }
 
-test('calling run with a promise which resolves', async () => {
+test('calling run with a promise which resolves, data updated', async () => {
 	const {promise, resolve} = deferred()
 	const resolvedValue = {message: 'resolved!'}
 	const initialState = {status: 'idle', data: null, error: null}
 	const {result} = renderHook(() => {
 		return useAsync(initialState)
 	})
-	// 🐨 assert the result.current is the correct default state
+
 	const {run, reset, setData, setError} = result.current
 	expect(result.current.data).toEqual(initialState.data)
 	expect(result.current.status).toEqual(initialState.status)
@@ -32,25 +31,21 @@ test('calling run with a promise which resolves', async () => {
 	expect(setData).toEqual(expect.any(Function))
 	expect(setError).toEqual(expect.any(Function))
 	
-	// 🐨 call `run`, passing the promise
 	act(() => {
 		run(promise)
 	})
 	
-	// 🐨 assert that result.current is the correct pending state
 	expect(result.current.status).toBe('pending')
 	expect(result.current.isLoading).toBe(true)
 	
-	// 🐨 call resolve and wait for the promise to be resolved
 	await act(async () => {
 		await resolve(resolvedValue)
 	})
-	// 🐨 assert the resolved state
+
 	expect(result.current.status).toBe('resolved')
 	expect(result.current.isSuccess).toBe(true)
 	expect(result.current.data).toBe(resolvedValue)
 	
-	// 🐨 assert the result.current has actually been reset
 	act(() => {
 		reset()
 	})
@@ -59,12 +54,26 @@ test('calling run with a promise which resolves', async () => {
 	expect(result.current.isIdle).toBe(true)
 	expect(result.current.isLoading).toBe(false)
 })
-	
-test.todo('calling run with a promise which rejects')
-// 🐨 this will be very similar to the previous test, except you'll reject the
-// promise instead and assert on the error state.
-// 💰 to avoid the promise actually failing your test, you can catch
-//    the promise returned from `run` with `.catch(() => {})`
+
+test('calling run with a promise which rejects, error updated', async () => {
+	const {promise, reject} = deferred()
+	const err = { message: 'Mocked error' }
+	const {result} = renderHook(() => {
+		return useAsync({})
+	})
+	act(() => {
+		result.current.run(promise).catch(e => e)
+	})
+
+	await act(async () => {
+		await reject(err)
+	})
+
+	expect(result.current.status).toBe('rejected')
+	expect(result.current.data).toBe(null)
+	expect(result.current.isError).toBe(true)
+	expect(result.current.error).toBe(err)
+})
 
 test.todo('can specify an initial state')
 // 💰 useAsync(customInitialState)
