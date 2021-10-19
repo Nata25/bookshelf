@@ -92,3 +92,22 @@ test(
     expect(request.headers.get('Content-type')).toBe('application/json')
   }
 )
+
+test('if response status is no successful, promise is rejected', async () => {
+  const endpoint = 'endpoint'
+  const errorResponse = {message: 'this is the response!'}
+  let error
+  server.use(
+    rest.get(`${apiUrl}/${endpoint}`, async (req, res, ctx) => {
+      return res(ctx.status(400), ctx.json(errorResponse))
+    })
+  )
+  try {
+    await client(endpoint)
+  } catch (e) {
+    error = e
+  }
+  expect(error).not.toBeFalsy()
+  await expect(client(endpoint)).rejects.toEqual(errorResponse)
+})
+
