@@ -152,16 +152,12 @@ test('No state updates happen if the component is unmounted while pending', asyn
   expect(console.error).toHaveBeenCalledTimes(0)
 })
 
-test('calling "run" without a promise results in an early error', async () => {
+test('calling "run" without a promise results in an early error', () => {
   const {result} = renderHook(() => useAsync())
   const notPromise = {}
-  let error
-	try {
-		result.current.run(notPromise)
-	} catch (e) {
-		error = e
-	}
-  expect(error).toMatchInlineSnapshot(
-    `[Error: The argument passed to useAsync().run must be a promise. Maybe a function that's passed isn't returning anything?]`,
+  expect(() => {
+    result.current.run(notPromise)
+  }).toThrowErrorMatchingInlineSnapshot(
+    `"The argument passed to useAsync().run must be a promise. Maybe a function that's passed isn't returning anything?"`,
   )
 })
