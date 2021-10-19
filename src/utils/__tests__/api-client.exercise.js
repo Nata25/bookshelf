@@ -1,5 +1,10 @@
+import {queryCache} from 'react-query'
+import * as auth from 'auth-provider'
 import {server, rest} from 'test/server'
 import {client} from '../api-client'
+
+jest.mock('auth-provider')
+jest.mock('react-query')
 
 const apiUrl = process.env.REACT_APP_API_URL
 
@@ -109,5 +114,20 @@ test('if response status is no successful, promise is rejected', async () => {
   }
   expect(error).not.toBeFalsy()
   await expect(client(endpoint)).rejects.toEqual(errorResponse)
+})
+
+test('if response status is 401, user is being logged out and query cache is cleared', async () => {
+  const endpoint = 'endpoint'
+  const errorResponse = {message: 'Please re-authenticate.'}
+  server.use(
+    rest.get(`${apiUrl}/${endpoint}`, async (req, res, ctx) => {
+      return res(ctx.status(401), ctx.json(errorResponse))
+    })
+  )
+
+  const result = await client(endpoint).catch(res => res)
+  expect(result).toEqual(errorResponse)
+  expect(queryCache.clear).toHaveBeenCalledTimes(1)
+  await expect(auth.logout).toHaveBeenCalledTimes(1)
 })
 
