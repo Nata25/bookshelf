@@ -10,6 +10,14 @@ function deferred() {
   return {promise, resolve, reject}
 }
 
+beforeEach(() => {
+	jest.spyOn(console, 'error')
+})
+
+afterEach(() => {
+	console.error.mockRestore()
+})
+
 test('calling run with a promise which resolves, data updated', async () => {
 	const {promise, resolve} = deferred()
 	const resolvedValue = {message: 'resolved!'}
@@ -112,8 +120,37 @@ test('can set the error', () => {
 	expect(result.current.isError).toBe(true)
 })
 
-test.todo('No state updates happen if the component is unmounted while pending')
-// 💰 const {result, unmount} = renderHook(...)
-// 🐨 ensure that console.error is not called (React will call console.error if updates happen when unmounted)
+test('No state updates happen if the component is unmounted while pending', async () => {
+	const {result, unmount} = renderHook(() => useAsync())
+	const {promise, resolve} = deferred()
+	const state = {
+		isIdle: true,
+		isLoading: false,
+		isError: false,
+		isSuccess: false,
+		setData: expect.any(Function),
+		setError: expect.any(Function),
+		error: null,
+		status: 'idle',
+		data: null,
+		run: expect.any(Function),
+		reset: expect.any(Function)
+	}
+	expect(result.current).toEqual(state)
+
+	act(() => {
+		result.current.run(promise)
+	})
+
+	expect(result.current.status).toBe('pending')
+
+	unmount()
+
+	await act(async () => {
+		await resolve()
+	})
+
+	expect(console.error).toHaveBeenCalledTimes(0)
+})
 
 test.todo('calling "run" without a promise results in an early error')
