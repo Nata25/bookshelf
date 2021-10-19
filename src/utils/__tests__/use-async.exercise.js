@@ -93,11 +93,24 @@ test('can specify an initial state which stays reactive after run', async () => 
 })
 
 
-test.todo('can set the data')
-// 💰 result.current.setData('whatever you want')
+test('can set the data', () => {
+	const {result} = renderHook(() => useAsync())
+	const newData = 'Mocked new data'
+	act(() => {
+		result.current.setData(newData)
+	})
+	expect(result.current.data).toBe(newData)
+})
 
-test.todo('can set the error')
-// 💰 result.current.setError('whatever you want')
+test('can set the error', () => {
+	const {result} = renderHook(() => useAsync())
+	const newError = 'Mocked new error'
+	act(() => {
+		result.current.setError(newError)
+	})
+	expect(result.current.error).toBe(newError)
+	expect(result.current.isError).toBe(true)
+})
 
 test.todo('No state updates happen if the component is unmounted while pending')
 // 💰 const {result, unmount} = renderHook(...)
