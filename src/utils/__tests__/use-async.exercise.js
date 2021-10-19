@@ -13,6 +13,7 @@ function deferred() {
 
 test('calling run with a promise which resolves', async () => {
 	const {promise, resolve} = deferred()
+	const resolvedValue = {message: 'resolved!'}
 	const initialState = {status: 'idle', data: null, error: null}
 	const {result} = renderHook(() => {
 		return useAsync(initialState)
@@ -42,11 +43,12 @@ test('calling run with a promise which resolves', async () => {
 	
 	// 🐨 call resolve and wait for the promise to be resolved
 	await act(async () => {
-		await resolve()
+		await resolve(resolvedValue)
 	})
 	// 🐨 assert the resolved state
 	expect(result.current.status).toBe('resolved')
 	expect(result.current.isSuccess).toBe(true)
+	expect(result.current.data).toBe(resolvedValue)
 	
 	// 🐨 assert the result.current has actually been reset
 	act(() => {
