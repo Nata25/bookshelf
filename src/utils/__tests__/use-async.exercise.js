@@ -75,8 +75,23 @@ test('calling run with a promise which rejects, error updated', async () => {
 	expect(result.current.error).toBe(err)
 })
 
-test.todo('can specify an initial state')
-// 💰 useAsync(customInitialState)
+test('can specify an initial state which stays reactive after run', async () => {
+	const customInitialState = {status: 'resolved', data: 'Mocked initial data'}
+	const {promise} = deferred()
+	const {result} = renderHook(() => useAsync(customInitialState))
+	expect(result.current.data).toBe(customInitialState.data)
+	expect(result.current.status).toBe('resolved')
+	expect(result.current.isSuccess).toBe(true)
+	expect(result.current.isError).toBe(false)
+
+	act(() => {
+		result.current.run(promise)
+	})
+	expect(result.current.data).toBe(customInitialState.data)
+	expect(result.current.status).toBe('pending')
+	expect(result.current.isLoading).toBe(true)
+})
+
 
 test.todo('can set the data')
 // 💰 result.current.setData('whatever you want')
