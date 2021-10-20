@@ -33,15 +33,29 @@ test('renders all the book information', async () => {
 	}
 
 	render(<App />, { wrapper: AppProviders })
-	waitFor(() => (
+	await waitFor(() => (
 		expect(screen.queryByLabelText(/loading/i)).not.toBeInTheDocument())
 	)
-	// screen.debug()
 
 	if (queryCache.isFetching) {
 		throw new Error('Loading screen is gone before query resolved. Check the fetch logic!')
 	}
-	
-	// 🐨 assert the book's info is in the document
+
+	// Check for present UI elements
+	expect(screen.getByRole('heading', {name: book.title })).toBeInTheDocument()
+	expect(screen.getByRole('img', {name: book.title + ' book cover' })).toHaveAttribute('src', book.coverImageUrl)
+	expect(screen.getByRole('heading', {name: book.title})).toHaveTextContent(book.title)
+	expect(screen.getByText(book.author)).toBeInTheDocument()
+	expect(screen.getByText(book.publisher)).toBeInTheDocument()
+	expect(screen.getByText(book.synopsis)).toBeInTheDocument()
+	expect(screen.getByRole('button', { name: /add/i})).toBeInTheDocument()
+
+	// Check for spare UI elements
+	expect(screen.queryByRole('button', { name: /remove/i})).not.toBeInTheDocument()
+	expect(screen.queryByRole('button', { name: /mark as read/i})).not.toBeInTheDocument()
+	expect(screen.queryByRole('button', { name: /unmark as read/i})).not.toBeInTheDocument()
+	expect(screen.queryByLabelText(/date/i)).not.toBeInTheDocument()
+	expect(screen.queryByRole('radio', { name: /star/i })).not.toBeInTheDocument()
+	expect(screen.queryByRole('textbox', { name: /notes/i })).not.toBeInTheDocument()
 	
 })
